@@ -21,7 +21,7 @@ function base58Equal(a, b) {
   assert.bufferEqual(base58.decode(a), base58.decode(b));
 }
 
-describe('HD', function() {
+describe('HD', function () {
   it('should create a pbkdf2 seed', () => {
     const seed = pbkdf2.derive(sha512,
       Buffer.from(vectors.phrase),

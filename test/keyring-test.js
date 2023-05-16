@@ -13,7 +13,7 @@ const uncompressed = KeyRing.fromSecret(
 const compressed = KeyRing.fromSecret(
   'L4rK1yDtCWekvXuE6oXD9jCYfFNV2cWRpVuPLBcCU2z8TrisoyY1', 'main');
 
-describe('KeyRing', function() {
+describe('KeyRing', function () {
   it('should get uncompressed public key', () => {
     assert.strictEqual(
       '04a34b99f22c790c4e36b2b3c2c35a36db06226e41c692fc82b8b56ac1c540c5bd5b'
