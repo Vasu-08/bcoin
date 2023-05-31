@@ -3,57 +3,34 @@
 'use strict';
 
 const assert = require('bsert');
-const Descriptor = require('../lib/wallet/descriptor');
-const { isHex, isCompressed } = require('../lib/utils/stringparsing');
+const Descriptor = require('../lib/wallet/descriptor/descriptor');
+const { isHex, isCompressed } = require('../lib/wallet/descriptor/common');
+const descriptors = [
+    `sh(multi(2,[00000000/111'/222]xprvA1RpRA33e1JQ7ifknakTFpgNXPmW2YvmhqLQYMmrj4xJXXWYpDPS3xz7iAxn8L39njGVyuoseXzU6rcxFLJ8HFsTjSyQbLYnMpCqE2VbFWc,xprv9uPDJpEQgRQfDcW7BkF7eTya6RPxXeJCqCJGHuCJ4GiRVLzkTXBAJMu2qaMWPrS7AANYqdq6vcBcBUdJCVVFceUvJFjaPdGZ2y9WACViL4L/0))#ggrsrxfy`,
+    `sh(multi(2,[00000000/111'/222]xpub6ERApfZwUNrhLCkDtcHTcxd75RbzS1ed54G1LkBUHQVHQKqhMkhgbmJbZRkrgZw4koxb5JaHWkY4ALHY2grBGRjaDMzQLcgJvLJuZZvRcEL,xpub68NZiKmJWnxxS6aaHmn81bvJeTESw724CRDs6HbuccFQN9Ku14VQrADWgqbhhTHBaohPX4CjNLf9fq9MYo6oDaPPLPxSb7gwQN3ih19Zm4Y/0))#tjg09x5t`,
+    `wpkh([d34db33f/84h/0h/0h]0279be667ef9dcbbac55a06295Ce870b07029Bfcdb2dce28d959f2815b16f81798)#qwlqgth7`,
+    `addr(mkmZxiEcEd8ZqjQWVZuC6so5dFMKEFpN2j)#02wpgw69`
+];
 describe('Descriptor', function () {
     describe('Checksum', function () {
-        it('should validate a descriptor checksum 1', function () {
-            const desc = `sh(multi(2,[00000000/111'/222]xprvA1RpRA33e1JQ7ifknakTFpgNXPmW2YvmhqLQYMmrj4xJXXWYpDPS3xz7iAxn8L39njGVyuoseXzU6rcxFLJ8HFsTjSyQbLYnMpCqE2VbFWc,xprv9uPDJpEQgRQfDcW7BkF7eTya6RPxXeJCqCJGHuCJ4GiRVLzkTXBAJMu2qaMWPrS7AANYqdq6vcBcBUdJCVVFceUvJFjaPdGZ2y9WACViL4L/0))#ggrsrxfy`;
-            const check = Descriptor.checkChecksum(desc, false);
-            assert.equal(check.length > 0, true);
-        });
-
-        it('should validate a descriptor checksum 2', function () {
-            const desc = `sh(multi(2,[00000000/111'/222]xpub6ERApfZwUNrhLCkDtcHTcxd75RbzS1ed54G1LkBUHQVHQKqhMkhgbmJbZRkrgZw4koxb5JaHWkY4ALHY2grBGRjaDMzQLcgJvLJuZZvRcEL,xpub68NZiKmJWnxxS6aaHmn81bvJeTESw724CRDs6HbuccFQN9Ku14VQrADWgqbhhTHBaohPX4CjNLf9fq9MYo6oDaPPLPxSb7gwQN3ih19Zm4Y/0))#tjg09x5t`;
-            const check = Descriptor.checkChecksum(desc, false);
-            assert.equal(check.length > 0, true);
-        });
-
-        it('should validate a descriptor checksum 3', function () {
-            const desc = `wpkh([d34db33f/84h/0h/0h]0279be667ef9dcbbac55a06295Ce870b07029Bfcdb2dce28d959f2815b16f81798)#qwlqgth7`;
-            const check = Descriptor.checkChecksum(desc, true);
-            assert.equal(check.length > 0, true);
-        });
-        it('should validate a descriptor checksum 4', function () {
-            const desc = `addr(mkmZxiEcEd8ZqjQWVZuC6so5dFMKEFpN2j)#02wpgw69`;
-            const check = Descriptor.checkChecksum(desc, true);
-            assert.equal(check.length > 0, true);
-        });
-
-        it('should return a descriptor with checksum for descriptor with no checksum 1', function () {
-            const desc = `sh(multi(2,[00000000/111'/222]xprvA1RpRA33e1JQ7ifknakTFpgNXPmW2YvmhqLQYMmrj4xJXXWYpDPS3xz7iAxn8L39njGVyuoseXzU6rcxFLJ8HFsTjSyQbLYnMpCqE2VbFWc,xprv9uPDJpEQgRQfDcW7BkF7eTya6RPxXeJCqCJGHuCJ4GiRVLzkTXBAJMu2qaMWPrS7AANYqdq6vcBcBUdJCVVFceUvJFjaPdGZ2y9WACViL4L/0))`;
-            const expected = Descriptor.addChecksum(desc, false);
-            const actual = `sh(multi(2,[00000000/111'/222]xprvA1RpRA33e1JQ7ifknakTFpgNXPmW2YvmhqLQYMmrj4xJXXWYpDPS3xz7iAxn8L39njGVyuoseXzU6rcxFLJ8HFsTjSyQbLYnMpCqE2VbFWc,xprv9uPDJpEQgRQfDcW7BkF7eTya6RPxXeJCqCJGHuCJ4GiRVLzkTXBAJMu2qaMWPrS7AANYqdq6vcBcBUdJCVVFceUvJFjaPdGZ2y9WACViL4L/0))#ggrsrxfy`;
-            assert.equal(expected, actual);
-        });
-
-        it('should return a descriptor with checksum for descriptor with no checksum 2', function () {
-            const desc = `addr(mkmZxiEcEd8ZqjQWVZuC6so5dFMKEFpN2j)`;
-            const expected = Descriptor.addChecksum(desc, false);
-            const actual = `addr(mkmZxiEcEd8ZqjQWVZuC6so5dFMKEFpN2j)#02wpgw69`;
-            assert.equal(expected, actual);
-        });
+        for (const desc of descriptors) {
+            it('should correctly validate a descriptor with checksum', function () {
+                const check = Descriptor.checkChecksum(desc, true);
+                assert.equal(check.length > 0, true);
+            });
+        }
 
         it('will error with incorrect checksum ', function () {
             const desc = `sh(multi(2,[00000000/111'/222]xpub6ERApfZwUNrhLCkDtcHTcxd75RbzS1ed54G1LkBUHQVHQKqhMkhgbmJbZRkrgZw4koxb5JaHWkY4ALHY2grBGRjaDMzQLcgJvLJuZZvRcEL,xpub68NZiKmJWnxxS6aaHmn81bvJeTESw724CRDs6HbuccFQN9Ku14VQrADWgqbhhTHBaohPX4CjNLf9fq9MYo6oDaPPLPxSb7gwQN3ih19Zm4Y/0))#tjq09x4t`;
-            const checksum = Descriptor.createChecksum(desc.split('#')[0]);
+            const expectedChecksum = Descriptor.createChecksum(desc.split('#')[0]);
+            const actualChecksum = desc.split('#')[1];
             let error = null;
             try {
                 Descriptor.checkChecksum(desc, true);
             } catch (e) {
                 error = e;
             }
-            assert.equal(error.message, `Provided checksum tjq09x4t does not match computed checksum ${checksum}`);
+            assert.equal(error.message, `Expected checksum ${expectedChecksum}, found ${actualChecksum}`);
         });
 
         it('will error with incorrect payload', function () {
@@ -64,7 +41,7 @@ describe('Descriptor', function () {
             } catch (e) {
                 error = e;
             }
-            assert.equal(error.message, 'Invalid characters in payload');
+            assert.equal(error.message, 'Character à invalid');
         });
 
         it('will error with a descriptor with missing checksum when require checksum is true', function () {
@@ -143,12 +120,14 @@ describe('Descriptor', function () {
             const descriptor = Descriptor.fromString(desc, 'main');
             assert(descriptor.getString(), desc);
         });
+
         it('Should parse a PK descriptor from HD private key', () => {
             const desc = `pk(xprvA1RpRA33e1JQ7ifknakTFpgNXPmW2YvmhqLQYMmrj4xJXXWYpDPS3xz7iAxn8L39njGVyuoseXzU6rcxFLJ8HFsTjSyQbLYnMpCqE2VbFWc)`;
             const descriptor = Descriptor.fromString(desc, 'main');
             assert.equal(typeof descriptor, 'object');
         });
-        it('will error for too long fingerprint', () => {
+
+        it('will error for short long fingerprint', () => {
             const desc = `pk([aaaaaaa]xpub661MyMwAqRbcFW31YEwpkMuc5THy2PSt5bDMsktWQcFF8syAmRUapSCGu8ED9W6oDMSgv6Zz8idoc4a6mr8BDzTJY47LJhkJ8UB7WEGuduB/2147483647'/0)`;
             let error = null;
             try {
@@ -156,8 +135,9 @@ describe('Descriptor', function () {
             } catch (e) {
                 error = e;
             }
-            assert.equal(error.message, `Fingerprint is not 4 bytes, 7 characters found instead of 8 characters`);
+            assert.equal(error.message, `Expected 8 characters fingerprint, found 7 instead`);
         });
+
         it('will error for non-hex fingerprint', () => {
             const desc = `pk([aaagaaaa]xpub661MyMwAqRbcFW31YEwpkMuc5THy2PSt5bDMsktWQcFF8syAmRUapSCGu8ED9W6oDMSgv6Zz8idoc4a6mr8BDzTJY47LJhkJ8UB7WEGuduB/2147483647'/0)`;
             let error = null;
@@ -168,6 +148,7 @@ describe('Descriptor', function () {
             }
             assert.equal(error.message, 'Fingerprint aaagaaaa is not hex');
         });
+
         it('will parse a sh() descriptor', () => {
             const desc = `sh(wsh(pkh(02e493dbf1c10d80f3581e4904930b1404cc6c13900ee0758474fa94abe8c4cd13)))#2wtr0ej5`;
             const descriptor = Descriptor.fromString(desc, 'main');
@@ -176,11 +157,12 @@ describe('Descriptor', function () {
             assert.equal(descriptor.isSolvable(), true);
             assert.equal(descriptor.hasPrivateKeys(), false);
         });
+
         it('will parse a pkh() descriptor', () => {
             const desc = `pkh([d34db33f/44'/0'/0']xpub6ERApfZwUNrhLCkDtcHTcxd75RbzS1ed54G1LkBUHQVHQKqhMkhgbmJbZRkrgZw4koxb5JaHWkY4ALHY2grBGRjaDMzQLcgJvLJuZZvRcEL/1/*)#ml40v0wf`;
             const descriptor = Descriptor.fromString(desc, 'main');
+            console.log(descriptor);
             assert.equal(descriptor.getString(), desc);
         });
     });
 });
-
