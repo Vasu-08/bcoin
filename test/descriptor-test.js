@@ -3,8 +3,8 @@
 'use strict';
 
 const assert = require('bsert');
-const DescriptorParser = require('../lib/wallet/descriptor/parser');
-const {createChecksum} = require('../lib/wallet/descriptor/common');
+const DescriptorParser = require('../lib/descriptor/parser');
+const {createChecksum} = require('../lib/descriptor/common');
 
 const testcases = [
   {
